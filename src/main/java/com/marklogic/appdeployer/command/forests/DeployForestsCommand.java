@@ -10,7 +10,7 @@ import com.marklogic.mgmt.api.forest.Forest;
 import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.hosts.DefaultHostNameProvider;
-import com.marklogic.mgmt.resource.hosts.HostManager;
+import com.marklogic.mgmt.resource.hosts.HostNameProvider;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -98,7 +98,7 @@ public class DeployForestsCommand extends AbstractCommand {
 
 	/**
 	 * Public so that it can be reused without actually saving any of the forests.
-	 *
+	 * <p>
 	 * This also facilitates the creation of forests for many databases at one time. A client can call this on a set of
 	 * these commands to construct a list of many forests that can be created via CMA in one request.
 	 *
@@ -110,7 +110,7 @@ public class DeployForestsCommand extends AbstractCommand {
 	public List<Forest> buildForests(CommandContext context, boolean includeReplicas) {
 		String template = buildForestTemplate(context, new ForestManager(context.getManageClient()));
 
-		List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
+		List<String> hostNames = context.getHostNames();
 		hostNames = determineHostNamesForForest(context, hostNames);
 
 		int countOfExistingForests = new DatabaseManager(context.getManageClient()).getPrimaryForestIds(this.databaseName).size();
@@ -179,7 +179,8 @@ public class DeployForestsCommand extends AbstractCommand {
 		}
 
 		if (hostCalculator == null) {
-			return new DefaultHostCalculator(new DefaultHostNameProvider(context.getManageClient())).calculateHostNames(this.databaseName, context);
+			HostNameProvider hostNameProvider = new DefaultHostNameProvider(context.getManageClient(), context.getHostNames());
+			return new DefaultHostCalculator(hostNameProvider).calculateHostNames(this.databaseName, context);
 		}
 
 		return hostCalculator.calculateHostNames(this.databaseName, context);

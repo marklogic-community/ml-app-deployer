@@ -5,8 +5,11 @@ import com.marklogic.mgmt.ManageClient;
 import com.marklogic.mgmt.admin.AdminManager;
 import com.marklogic.mgmt.api.configuration.Configuration;
 import com.marklogic.mgmt.api.configuration.Configurations;
+import com.marklogic.mgmt.resource.hosts.HostManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +55,22 @@ public class CommandContext {
 
 	public void removeCombinedCmaRequest() {
 		contextMap.remove(COMBINED_CMA_REQUEST_KEY);
+	}
+
+	/**
+	 * Commands should use this when they need host names so that they're only retrieved once. This caching should be
+	 * safe as it is very unlikely that the set of host names will change during a deployment.
+	 *
+	 * @return
+	 */
+	public List<String> getHostNames() {
+		final String key = "host-names";
+		List<String> hostNames = (List<String>)contextMap.get(key);
+		if (hostNames == null) {
+			hostNames = new HostManager(getManageClient()).getHostNames();
+			contextMap.put(key, hostNames);
+		}
+		return hostNames;
 	}
 
 	public AppConfig getAppConfig() {

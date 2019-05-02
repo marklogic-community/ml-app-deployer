@@ -42,7 +42,9 @@ public class CmaDeployerListener extends DeployerListenerSupport {
 
 				if (configs.hasResources()) {
 					logger.info("Submitting combined CMA request");
+					long start = System.currentTimeMillis();
 					configs.submit(commandContext.getManageClient());
+					logger.info("Submitted combined CMA request, duration: " + (System.currentTimeMillis() - start) + "ms");
 
 					if (command instanceof DeployAmpsCommand || remainingCommands.isEmpty()) {
 						List<DatabasePlan> databasePlans = (List<DatabasePlan>) commandContext.getContextMap().get("database-plans");

@@ -11,7 +11,6 @@ import com.marklogic.mgmt.resource.databases.DatabaseManager;
 import com.marklogic.mgmt.resource.forests.ForestManager;
 import com.marklogic.mgmt.resource.forests.ForestStatus;
 import com.marklogic.mgmt.resource.groups.GroupManager;
-import com.marklogic.mgmt.resource.hosts.HostManager;
 
 import java.util.*;
 
@@ -43,7 +42,7 @@ public class ConfigureForestReplicasCommand extends AbstractUndoableCommand {
 			return;
 		}
 
-		List<String> hostNames = new HostManager(context.getManageClient()).getHostNames();
+		List<String> hostNames = context.getHostNames();
 		if (hostNames.size() < 2) {
 			if (logger.isInfoEnabled()) {
 				logger.info("Only found one host, so not configuring any replica forests; host: " + hostNames.get(0));
